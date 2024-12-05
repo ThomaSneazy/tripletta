@@ -1,6 +1,10 @@
 import './styles/style.css'
 import Lenis from '@studio-freight/lenis'
 import gsap from 'gsap'
+import { Observer } from "gsap/Observer";
+
+// Enregistrer le plugin
+gsap.registerPlugin(Observer);
 
 // Affiche les informations de contact du développeur dans la console
 console.log(
@@ -41,6 +45,11 @@ const colorPalettes = [
     }
 ];
 
+// Variables pour stocker les instances d'animation
+let currentLoop = null;
+let currentObserver = null;
+let menuIsOpen = false;
+
 // Initialisation principale au chargement de la page
 window.addEventListener('load', () => {
    // Configuration des transitions globales
@@ -71,33 +80,6 @@ window.addEventListener('load', () => {
    }
    requestAnimationFrame(rafMainScroll);
 
-   // Configuration du menu ville avec défilement infini
-   const menuVilleWrapper = document.querySelector('.menu-ville__wrapper');
-   const menuVilleItems = menuVilleWrapper.children;
-   const itemHeight = menuVilleItems[0].offsetHeight;
-   const totalHeight = itemHeight * menuVilleItems.length;
-
-   menuVilleLenisInstance = new Lenis({
-      wrapper: menuVilleWrapper,
-      content: menuVilleWrapper,
-      duration: 1.5,
-      orientation: 'vertical',
-      smoothWheel: true,
-      smoothTouch: false,
-      touchMultiplier: 1.5,
-      infinite: true,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
-   });
-
-   // Gestion du défilement infini pour le menu ville
-   menuVilleLenisInstance.on('scroll', (e) => {
-       const scroll = e.scroll;
-       if (scroll >= totalHeight) {
-           menuVilleLenisInstance.scrollTo(0, { immediate: true });
-       } else if (scroll <= 0) {
-           menuVilleLenisInstance.scrollTo(totalHeight, { immediate: true });
-       }
-   });
 
    // Gestion du changement de couleurs au scroll vers le footer
    lenisInstance.on('scroll', () => {
@@ -126,65 +108,137 @@ window.addEventListener('load', () => {
    const mainMenuWrapper = document.querySelector('.menu__wrapper');
    const showMenuButton = document.querySelector('.show-menu');
 
-   mainMenuWrapper.style.display = 'none';
-
-   // Ouverture du menu principal
    showMenuButton.addEventListener('click', () => {
+       if (menuIsOpen) return; 
+       menuIsOpen = true;
        mainMenuWrapper.style.display = 'block';
        
-       const menuVilleWrapper = mainMenuWrapper.querySelector('.menu-ville__wrapper');
-       const menuItems = [...menuVilleWrapper.children]; // Convertir en tableau
-       const itemHeight = menuItems[0].offsetHeight;
-       const totalHeight = itemHeight * menuItems.length;
+       lenisInstance.stop();
 
-       // Dupliquer les éléments plusieurs fois pour créer un tampon
-       for (let i = 0; i < 5; i++) { // Dupliquer 5 fois
-           menuItems.forEach(item => {
-               const clone = item.cloneNode(true);
-               menuVilleWrapper.appendChild(clone);
+       const menuItems = gsap.utils.toArray('.menu-ville__item');
+       gsap.set(menuItems, {
+           clearProps: "all",
+           y: function(i) {
+               return i * menuItems[0].offsetHeight;
+           }
+       });
+       
+       requestAnimationFrame(() => {
+           currentLoop = verticalLoop(".menu-ville__item", {
+               repeat: -1,
+               speed: 1.5
            });
-       }
 
-       if (mainMenuLenisInstance) mainMenuLenisInstance.destroy();
-       mainMenuLenisInstance = new Lenis({
-           wrapper: menuVilleWrapper,
-           content: menuVilleWrapper,
-           duration: 0, // Pas de durée pour un saut instantané
-           orientation: 'vertical',
-           smoothWheel: true,
-           smoothTouch: false,
-           touchMultiplier: 1.5,
-           infinite: false,
-           easing: (t) => t // Easing linéaire pour un défilement fluide
+           currentLoop.timeScale(0);
+
+           currentObserver = Observer.create({
+               target: ".menu-ville__wrapper",
+               type: "wheel,touch",
+               wheelSpeed: -0.5,
+               onChange: self => {
+                   if (!currentLoop) return;
+                   const speed = -self.deltaY * 0.5;
+                   currentLoop.timeScale(speed);
+                   
+                   gsap.to(currentLoop, {
+                       timeScale: 0,
+                       duration: 1.5,
+                       ease: "power2.out"
+                   });
+               }
+           });
+       });
+   });
+
+   function closeMenu() {
+       if (!menuIsOpen) return;
+       
+       lenisInstance.start();
+       
+       if (currentObserver) {
+           currentObserver.kill();
+           currentObserver = null;
+       }
+       
+       if (currentLoop) {
+           currentLoop.kill();
+           currentLoop = null;
+       }
+       
+       mainMenuWrapper.style.display = 'none';
+       menuIsOpen = false;
+   }
+
+   function verticalLoop(items, config) {
+       items = gsap.utils.toArray(items);
+       config = config || {};
+       let tl = gsap.timeline({
+           repeat: config.repeat,
+           paused: config.paused,
+           defaults: {ease: "none"},
+           onReverseComplete: () => tl.totalTime(tl.rawTime() + tl.duration() * 100)
        });
 
-       // Gestion du défilement infini pour le menu principal
-       mainMenuLenisInstance.on('scroll', (e) => {
-           const scroll = e.scroll;
-           const bufferHeight = totalHeight * 5; // Utiliser un tampon beaucoup plus large
+       let length = items.length,
+           startY = items[0].offsetTop,
+           times = [],
+           heights = [],
+           yPercents = [],
+           pixelsPerSecond = (config.speed || 1) * 100,
+           snap = config.snap === false ? v => v : gsap.utils.snap(config.snap || 1);
 
-           if (scroll >= bufferHeight) {
-               mainMenuLenisInstance.scrollTo(scroll - totalHeight, { immediate: true });
-           } else if (scroll <= totalHeight) {
-               mainMenuLenisInstance.scrollTo(scroll + totalHeight, { immediate: true });
+       gsap.set(items, {
+           yPercent: (i, el) => {
+               let h = heights[i] = parseFloat(gsap.getProperty(el, "height", "px"));
+               yPercents[i] = snap(parseFloat(gsap.getProperty(el, "y", "px")) / h * 100 + gsap.getProperty(el, "yPercent"));
+               return yPercents[i];
            }
        });
 
-       function rafMenuScroll(time) {
-           if (mainMenuLenisInstance) mainMenuLenisInstance.raf(time);
-           requestAnimationFrame(rafMenuScroll);
-       }
-       requestAnimationFrame(rafMenuScroll);
-   });
+       gsap.set(items, {y: 0});
 
-   // Fermeture du menu principal avec la touche Escape
+       let totalHeight = items[length-1].offsetTop + yPercents[length-1] / 100 * heights[length-1] - startY + 
+                        items[length-1].offsetHeight * gsap.getProperty(items[length-1], "scaleY");
+
+       items.forEach((item, i) => {
+           let curY = yPercents[i] / 100 * heights[i];
+           let distanceToStart = item.offsetTop + curY - startY;
+           let distanceToLoop = distanceToStart + heights[i] * gsap.getProperty(item, "scaleY");
+
+           tl.to(item, {
+               yPercent: snap((curY - distanceToLoop) / heights[i] * 100),
+               duration: distanceToLoop / pixelsPerSecond
+           }, 0)
+           .fromTo(item, 
+               {yPercent: snap((curY - distanceToLoop + totalHeight) / heights[i] * 100)},
+               {yPercent: yPercents[i], duration: (curY - distanceToLoop + totalHeight - curY) / pixelsPerSecond, immediateRender: false},
+               distanceToLoop / pixelsPerSecond
+           );
+       });
+
+       return tl;
+   }
+
    document.addEventListener('keydown', (event) => {
        if (event.key === 'Escape') {
-           mainMenuWrapper.style.display = 'none';
-           if (mainMenuLenisInstance) {
-               mainMenuLenisInstance.destroy();
-               mainMenuLenisInstance = null;
-           }
+           closeMenu();
        }
    });
+
+   // Gestion des clics sur les restaurants
+   const restaurantItems = document.querySelectorAll('.restaurant__item');
+   restaurantItems.forEach(item => {
+       item.addEventListener('click', () => {
+           // Retire la classe active de tous les restaurants
+           restaurantItems.forEach(restaurant => {
+               restaurant.classList.remove('active');
+           });
+           
+           // Ajoute la classe active au restaurant cliqué
+           item.classList.add('active');
+       });
+   });
 });
+
+
+  
