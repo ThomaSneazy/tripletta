@@ -104,6 +104,11 @@ window.addEventListener('load', () => {
        }
    });
 
+   // Clone du menu list wrapper
+   const menuListWrapper = document.querySelector('.menu__list__wrapper');
+   const menuListClone = menuListWrapper.cloneNode(true);
+   menuListWrapper.appendChild(menuListClone);
+
    // Gestion du menu principal
    const mainMenuWrapper = document.querySelector('.menu__wrapper');
    const showMenuButton = document.querySelector('.show-menu');
@@ -115,39 +120,21 @@ window.addEventListener('load', () => {
        
        lenisInstance.stop();
 
-       const menuItems = gsap.utils.toArray('.menu-ville__item');
-       gsap.set(menuItems, {
-           clearProps: "all",
-           y: function(i) {
-               return i * menuItems[0].offsetHeight;
-           }
+       // Initialisation du scroll pour le menu
+       mainMenuLenisInstance = new Lenis({
+           duration: 1,
+           orientation: 'vertical',
+           smoothWheel: true,
+           smoothTouch: false,
+           wrapper: mainMenuWrapper, // Spécifier le wrapper du menu
+           content: mainMenuWrapper.querySelector('.menu__list__wrapper') // Spécifier le contenu à scroller
        });
-       
-       requestAnimationFrame(() => {
-           currentLoop = verticalLoop(".menu-ville__item", {
-               repeat: -1,
-               speed: 1.5
-           });
 
-           currentLoop.timeScale(0);
-
-           currentObserver = Observer.create({
-               target: ".menu-ville__wrapper",
-               type: "wheel,touch",
-               wheelSpeed: -0.5,
-               onChange: self => {
-                   if (!currentLoop) return;
-                   const speed = -self.deltaY * 0.5;
-                   currentLoop.timeScale(speed);
-                   
-                   gsap.to(currentLoop, {
-                       timeScale: 0,
-                       duration: 1.5,
-                       ease: "power2.out"
-                   });
-               }
-           });
-       });
+       function rafMenuScroll(time) {
+           mainMenuLenisInstance.raf(time);
+           requestAnimationFrame(rafMenuScroll);
+       }
+       requestAnimationFrame(rafMenuScroll);
    });
 
    function closeMenu() {
@@ -155,68 +142,13 @@ window.addEventListener('load', () => {
        
        lenisInstance.start();
        
-       if (currentObserver) {
-           currentObserver.kill();
-           currentObserver = null;
-       }
-       
-       if (currentLoop) {
-           currentLoop.kill();
-           currentLoop = null;
+       if (mainMenuLenisInstance) {
+           mainMenuLenisInstance.destroy();
+           mainMenuLenisInstance = null;
        }
        
        mainMenuWrapper.style.display = 'none';
        menuIsOpen = false;
-   }
-
-   function verticalLoop(items, config) {
-       items = gsap.utils.toArray(items);
-       config = config || {};
-       let tl = gsap.timeline({
-           repeat: config.repeat,
-           paused: config.paused,
-           defaults: {ease: "none"},
-           onReverseComplete: () => tl.totalTime(tl.rawTime() + tl.duration() * 100)
-       });
-
-       let length = items.length,
-           startY = items[0].offsetTop,
-           times = [],
-           heights = [],
-           yPercents = [],
-           pixelsPerSecond = (config.speed || 1) * 100,
-           snap = config.snap === false ? v => v : gsap.utils.snap(config.snap || 1);
-
-       gsap.set(items, {
-           yPercent: (i, el) => {
-               let h = heights[i] = parseFloat(gsap.getProperty(el, "height", "px"));
-               yPercents[i] = snap(parseFloat(gsap.getProperty(el, "y", "px")) / h * 100 + gsap.getProperty(el, "yPercent"));
-               return yPercents[i];
-           }
-       });
-
-       gsap.set(items, {y: 0});
-
-       let totalHeight = items[length-1].offsetTop + yPercents[length-1] / 100 * heights[length-1] - startY + 
-                        items[length-1].offsetHeight * gsap.getProperty(items[length-1], "scaleY");
-
-       items.forEach((item, i) => {
-           let curY = yPercents[i] / 100 * heights[i];
-           let distanceToStart = item.offsetTop + curY - startY;
-           let distanceToLoop = distanceToStart + heights[i] * gsap.getProperty(item, "scaleY");
-
-           tl.to(item, {
-               yPercent: snap((curY - distanceToLoop) / heights[i] * 100),
-               duration: distanceToLoop / pixelsPerSecond
-           }, 0)
-           .fromTo(item, 
-               {yPercent: snap((curY - distanceToLoop + totalHeight) / heights[i] * 100)},
-               {yPercent: yPercents[i], duration: (curY - distanceToLoop + totalHeight - curY) / pixelsPerSecond, immediateRender: false},
-               distanceToLoop / pixelsPerSecond
-           );
-       });
-
-       return tl;
    }
 
    document.addEventListener('keydown', (event) => {
@@ -225,20 +157,97 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Gestion des clics sur les restaurants
+   // Animation des restaurants
    const restaurantItems = document.querySelectorAll('.restaurant__item');
    restaurantItems.forEach(item => {
+       let isExpanded = false;
+       let originalHeight;
+       
        item.addEventListener('click', () => {
-           // Retire la classe active de tous les restaurants
-           restaurantItems.forEach(restaurant => {
-               restaurant.classList.remove('active');
-           });
+           const bannerResto = item.querySelector('.banner-resto');
            
-           // Ajoute la classe active au restaurant cliqué
-           item.classList.add('active');
+           if (!isExpanded) {
+               originalHeight = item.offsetHeight;
+               lenisInstance.stop();
+               
+               gsap.to(item, {
+                   height: '50vh',
+                   duration: 0.8,
+                   ease: 'power2.out',
+               });
+
+               // Animation de la bannière
+               gsap.to(bannerResto, {
+                   height: '100%',
+                   duration: 0.8,
+                   ease: 'power2.out',
+                   onComplete: () => {
+                       lenisInstance.start();
+                   }
+               });
+           } else {
+               lenisInstance.stop();
+               
+               gsap.to(item, {
+                   height: originalHeight,
+                   duration: 0.8,
+                   ease: 'power2.out',
+               });
+
+               // Retour à la hauteur initiale de la bannière
+               gsap.to(bannerResto, {
+                   height: '0%',
+                   duration: 0.8,
+                   ease: 'power2.out',
+                   onComplete: () => {
+                       item.style.height = 'auto';
+                       lenisInstance.start();
+                   }
+               });
+           }
+           
+           isExpanded = !isExpanded;
+       });
+   });
+
+   // Gestion des dropdowns du menu ville
+   const dropdowns = document.querySelectorAll('.menu-ville__dropdown');
+   let activeDropdown = null;
+
+   dropdowns.forEach(dropdown => {
+       // Définir la hauteur initiale
+       dropdown.style.height = '8.2rem';
+
+       dropdown.addEventListener('click', (e) => {
+           e.stopPropagation(); // Empêche la propagation du clic
+
+           if (activeDropdown && activeDropdown !== dropdown) {
+               // Fermer le dropdown actif
+               gsap.to(activeDropdown, {
+                   height: '8.2rem',
+                   duration: 0.4,
+                   ease: 'power2.out'
+               });
+           }
+
+           if (activeDropdown === dropdown) {
+               // Fermer le dropdown actuel
+               gsap.to(dropdown, {
+                   height: '8.2rem',
+                   duration: 0.4,
+                   ease: 'power2.out'
+               });
+               activeDropdown = null;
+           } else {
+               // Ouvrir le nouveau dropdown
+               const autoHeight = dropdown.scrollHeight;
+               gsap.to(dropdown, {
+                   height: autoHeight,
+                   duration: 0.4,
+                   ease: 'power2.out'
+               });
+               activeDropdown = dropdown;
+           }
        });
    });
 });
-
-
-  
