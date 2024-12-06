@@ -104,37 +104,47 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Clone du menu list wrapper
+//    Clone du menu list wrapper
    const menuListWrapper = document.querySelector('.menu__list__wrapper');
-   const menuListClone = menuListWrapper.cloneNode(true);
-   menuListWrapper.appendChild(menuListClone);
+   const menuListClone1 = menuListWrapper.cloneNode(true);
+   const menuListClone2 = menuListWrapper.cloneNode(true);
+   const menuListClone3 = menuListWrapper.cloneNode(true);
+   const menuListClone4 = menuListWrapper.cloneNode(true);
+   const menuListClone5 = menuListWrapper.cloneNode(true);
+   menuListWrapper.appendChild(menuListClone1);
+   menuListWrapper.appendChild(menuListClone2);
+   menuListWrapper.appendChild(menuListClone3);
+   menuListWrapper.appendChild(menuListClone4);
+   menuListWrapper.appendChild(menuListClone5);
 
    // Gestion du menu principal
    const mainMenuWrapper = document.querySelector('.menu__wrapper');
-   const showMenuButton = document.querySelector('.show-menu');
+   const showMenuButtons = document.querySelectorAll('.show-menu');
 
-   showMenuButton.addEventListener('click', () => {
-       if (menuIsOpen) return; 
-       menuIsOpen = true;
-       mainMenuWrapper.style.display = 'block';
-       
-       lenisInstance.stop();
+   showMenuButtons.forEach(showMenuButton => {
+       showMenuButton.addEventListener('click', () => {
+           if (menuIsOpen) return; 
+           menuIsOpen = true;
+           mainMenuWrapper.style.display = 'block';
+           
+           lenisInstance.stop();
 
-       // Initialisation du scroll pour le menu
-       mainMenuLenisInstance = new Lenis({
-           duration: 1,
-           orientation: 'vertical',
-           smoothWheel: true,
-           smoothTouch: false,
-           wrapper: mainMenuWrapper, // Spécifier le wrapper du menu
-           content: mainMenuWrapper.querySelector('.menu__list__wrapper') // Spécifier le contenu à scroller
-       });
+           // Initialisation du scroll pour le menu
+           mainMenuLenisInstance = new Lenis({
+               duration: 1,
+               orientation: 'vertical',
+               smoothWheel: true,
+               smoothTouch: false,
+               wrapper: mainMenuWrapper,
+               content: mainMenuWrapper.querySelector('.menu__list__wrapper')
+           });
 
-       function rafMenuScroll(time) {
-           mainMenuLenisInstance.raf(time);
+           function rafMenuScroll(time) {
+               mainMenuLenisInstance.raf(time);
+               requestAnimationFrame(rafMenuScroll);
+           }
            requestAnimationFrame(rafMenuScroll);
-       }
-       requestAnimationFrame(rafMenuScroll);
+       });
    });
 
    function closeMenu() {
@@ -157,95 +167,182 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Animation des restaurants
-   const restaurantItems = document.querySelectorAll('.restaurant__item');
-   restaurantItems.forEach(item => {
-       let isExpanded = false;
-       let originalHeight;
-       
-       item.addEventListener('click', () => {
-           const bannerResto = item.querySelector('.banner-resto');
-           
-           if (!isExpanded) {
-               originalHeight = item.offsetHeight;
-               lenisInstance.stop();
-               
-               gsap.to(item, {
-                   height: '50vh',
-                   duration: 0.8,
-                   ease: 'power2.out',
-               });
-
-               // Animation de la bannière
-               gsap.to(bannerResto, {
-                   height: '100%',
-                   duration: 0.8,
-                   ease: 'power2.out',
-                   onComplete: () => {
-                       lenisInstance.start();
-                   }
-               });
-           } else {
-               lenisInstance.stop();
-               
-               gsap.to(item, {
-                   height: originalHeight,
-                   duration: 0.8,
-                   ease: 'power2.out',
-               });
-
-               // Retour à la hauteur initiale de la bannière
-               gsap.to(bannerResto, {
-                   height: '0%',
-                   duration: 0.8,
-                   ease: 'power2.out',
-                   onComplete: () => {
-                       item.style.height = 'auto';
-                       lenisInstance.start();
-                   }
-               });
-           }
-           
-           isExpanded = !isExpanded;
-       });
-   });
-
    // Gestion des dropdowns du menu ville
    const dropdowns = document.querySelectorAll('.menu-ville__dropdown');
    let activeDropdown = null;
+   let activeRestaurant = null;
 
    dropdowns.forEach(dropdown => {
-       // Définir la hauteur initiale
        dropdown.style.height = '8.2rem';
+       const clickElement = dropdown.querySelector('.menu-ville__click');
+       const restaurantItems = dropdown.querySelectorAll('.restaurant__item');
 
-       dropdown.addEventListener('click', (e) => {
-           e.stopPropagation(); // Empêche la propagation du clic
+       // Gestion des restaurants
+       restaurantItems.forEach(restaurant => {
+           restaurant.style.height = '6rem';
+           const bannerResto = restaurant.querySelector('.banner-resto');
+           const restaurantLinkAbsolute = restaurant.querySelector('.restaurant-link-absolute');
+           
+           if (bannerResto) {
+               bannerResto.style.height = '0';
+           }
+           
+           // Gestion du restaurant item
+           restaurant.addEventListener('click', (e) => {
+               e.stopPropagation();
+               
+               if (activeRestaurant && activeRestaurant !== restaurant) {
+                   const oldBanner = activeRestaurant.querySelector('.banner-resto');
+                   const oldRestaurantLink = activeRestaurant.querySelector('.restaurant-link');
+                   const oldRestaurantLinkAbsolute = activeRestaurant.querySelector('.restaurant-link-absolute');
+                   
+                   if (oldBanner) {
+                       gsap.to(oldBanner, {
+                           height: '0',
+                           duration: 0.8,
+                           ease: 'power2.inOut'
+                       });
+                   }
+                   gsap.to(activeRestaurant, {
+                       height: '6rem',
+                       duration: 0.8,
+                       ease: 'power2.inOut'
+                   });
+                   oldRestaurantLink.classList.add('no-point');
+                   oldRestaurantLinkAbsolute.classList.remove('active'); // Retire active de l'ancien
+               }
+
+               const restaurantLink = restaurant.querySelector('.restaurant-link');
+               
+               if (activeRestaurant === restaurant) {
+                   const banner = restaurant.querySelector('.banner-resto');
+                   gsap.to([restaurant, banner], {
+                       height: '6rem',
+                       duration: 0.8,
+                       ease: 'power2.inOut',
+                       onComplete: () => {
+                           gsap.to(dropdown, {
+                               height: 'auto',
+                               duration: 0.1
+                           });
+                           restaurantLink.classList.add('no-point');
+                           restaurantLinkAbsolute.classList.remove('active'); // Retire active à la fermeture
+                       }
+                   });
+                   activeRestaurant = null;
+               } else {
+                   const banner = restaurant.querySelector('.banner-resto');
+                   gsap.to([restaurant, banner], {
+                       height: '60vh',
+                       duration: 0.8,
+                       ease: 'power2.inOut',
+                       onComplete: () => {
+                           gsap.to(dropdown, {
+                               height: 'auto',
+                               duration: 0.1
+                           });
+                       }
+                   });
+                   activeRestaurant = restaurant;
+                   restaurantLink.classList.remove('no-point');
+                   restaurantLinkAbsolute.classList.add('active'); // Ajoute active à l'ouverture
+               }
+           });
+
+           // Gestion du clic sur le lien absolu
+           restaurantLinkAbsolute.addEventListener('click', (e) => {
+               e.preventDefault();
+               e.stopPropagation();
+               
+               if (restaurant === activeRestaurant) {
+                   // Fade out du restaurant-link
+                   const restaurantLink = restaurant.querySelector('.restaurant-link');
+                   gsap.to(restaurantLink, {
+                       opacity: 0,
+                       duration: 0.8,
+                       ease: 'power2.out'
+                   });
+
+                   mainMenuLenisInstance.scrollTo(restaurant, {
+                       offset: 0,
+                       duration: 1,
+                       immediate: false,
+                       onComplete: () => {
+                           const banner = restaurant.querySelector('.banner-resto');
+                           
+                           gsap.to(restaurant, {
+                               height: '100vh',
+                               duration: 1.2,
+                               ease: 'power2.inOut'
+                           });
+                           
+                           gsap.to(banner, {
+                               height: '100%',
+                               duration: 1.2,
+                               ease: 'power2.inOut',
+                               onComplete: () => {
+                                   window.location.href = restaurantLinkAbsolute.getAttribute('href');
+                               }
+                           });
+                       }
+                   });
+               }
+           });
+       });
+
+       // Gestion du dropdown
+       clickElement.addEventListener('click', (e) => {
+           e.stopPropagation();
+
+           // Réinitialiser tous les restaurants et bannières
+           if (activeRestaurant) {
+               const banner = activeRestaurant.querySelector('.banner-resto');
+               if (banner) {
+                   gsap.to(banner, {
+                       height: '0',
+                       duration: 0.8,
+                       ease: 'power2.inOut'
+                   });
+               }
+               gsap.to(activeRestaurant, {
+                   height: '8.2rem',
+                   duration: 0.8,
+                   ease: 'power2.inOut'
+               });
+               activeRestaurant = null;
+           }
 
            if (activeDropdown && activeDropdown !== dropdown) {
-               // Fermer le dropdown actif
                gsap.to(activeDropdown, {
                    height: '8.2rem',
-                   duration: 0.4,
-                   ease: 'power2.out'
+                   duration: 0.8,
+                   ease: 'power2.inOut'
                });
            }
 
            if (activeDropdown === dropdown) {
-               // Fermer le dropdown actuel
                gsap.to(dropdown, {
                    height: '8.2rem',
-                   duration: 0.4,
-                   ease: 'power2.out'
+                   duration: 0.8,
+                   ease: 'power2.inOut'
                });
                activeDropdown = null;
            } else {
-               // Ouvrir le nouveau dropdown
-               const autoHeight = dropdown.scrollHeight;
-               gsap.to(dropdown, {
-                   height: autoHeight,
-                   duration: 0.4,
-                   ease: 'power2.out'
-               });
+               // Calculer la hauteur finale avant l'animation
+               const finalHeight = dropdown.scrollHeight;
+               dropdown.style.height = '8.2rem';
+               
+               gsap.fromTo(dropdown, 
+                   { height: '8.2rem' },
+                   {
+                       height: finalHeight,
+                       duration: 0.8,
+                       ease: 'power2.inOut',
+                       onComplete: () => {
+                           dropdown.style.height = 'auto';
+                       }
+                   }
+               );
                activeDropdown = dropdown;
            }
        });
