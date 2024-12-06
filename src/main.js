@@ -3,10 +3,8 @@ import Lenis from '@studio-freight/lenis'
 import gsap from 'gsap'
 import { Observer } from "gsap/Observer";
 
-// Enregistrer le plugin
 gsap.registerPlugin(Observer);
 
-// Affiche les informations de contact du développeur dans la console
 console.log(
     '%c Dev by Thomas Carré\n' + 
     '🌐 Website: https://carre.studio.com\n' +
@@ -16,53 +14,45 @@ console.log(
     'background-color: #0b0b0b; color: #8B9A46; font-size:10px; padding:6px 10px 6px; border-radius:4px; line-height: 1.5;'
 )
 
-// Instances des scrolls fluides Lenis
 let lenisInstance;
 let menuVilleLenisInstance;
 let mainMenuLenisInstance;
 
-// Variables pour la gestion du changement de couleurs
 let hasChangedColors = false;
 let currentColorIndex = 0;
 
-// Palettes de couleurs pour les transitions
 const colorPalettes = [
     {
-        light: '#f9cfe7', // Rouge brique
-        dark: '#C7361C'   // Rose très pâle / Blanc rosé
+        light: '#f9cfe7',
+        dark: '#C7361C'   
     },
     {
-        light: '#d3edef', // Bleu glacier clair
-        dark: '#314b98'   // Bleu royal
+        light: '#d3edef',
+        dark: '#314b98'   
     },
     {
-        light: '#ff6a00', // Orange vif
-        dark: '#f8da52'   // Crème / Jaune pâle
+        light: '#ff6a00',
+        dark: '#f8da52'   
     },
     {
-        light: '#bdd0a0', // Vert pâle / Sauge
-        dark: '#004632'   // Vert forêt foncé
+        light: '#bdd0a0',
+        dark: '#004632'   
     }
 ];
 
-// Variables pour stocker les instances d'animation
 let currentLoop = null;
 let currentObserver = null;
 let menuIsOpen = false;
 
-// Initialisation principale au chargement de la page
 window.addEventListener('load', () => {
-   // Configuration des transitions globales
    document.documentElement.style.setProperty('transition', 'all 0.3s ease-in-out');
    
-   // Configuration des transitions pour les SVG
    const svgs = document.querySelectorAll('svg');
    svgs.forEach(svg => {
        svg.style.transition = 'all 0.3s ease-in-out';
        svg.style.willChange = 'transform';
    });
 
-   // Initialisation du scroll principal
    lenisInstance = new Lenis({
       duration: 1,
       orientation: 'vertical',
@@ -73,15 +63,12 @@ window.addEventListener('load', () => {
       easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t))
    });
 
-   // Fonction d'animation pour le scroll principal
    function rafMainScroll(time) {
        lenisInstance.raf(time);
        requestAnimationFrame(rafMainScroll);
    }
    requestAnimationFrame(rafMainScroll);
 
-
-   // Gestion du changement de couleurs au scroll vers le footer
    lenisInstance.on('scroll', () => {
        const footer = document.querySelector('.section.footer');
        const footerTop = footer.getBoundingClientRect().top;
@@ -104,7 +91,6 @@ window.addEventListener('load', () => {
        }
    });
 
-//    Clone du menu list wrapper
    const menuListWrapper = document.querySelector('.menu__list__wrapper');
    const menuListClone1 = menuListWrapper.cloneNode(true);
    const menuListClone2 = menuListWrapper.cloneNode(true);
@@ -117,7 +103,6 @@ window.addEventListener('load', () => {
    menuListWrapper.appendChild(menuListClone4);
    menuListWrapper.appendChild(menuListClone5);
 
-   // Gestion du menu principal
    const mainMenuWrapper = document.querySelector('.menu__wrapper');
    const showMenuButtons = document.querySelectorAll('.show-menu');
 
@@ -129,7 +114,6 @@ window.addEventListener('load', () => {
            
            lenisInstance.stop();
 
-           // Initialisation du scroll pour le menu
            mainMenuLenisInstance = new Lenis({
                duration: 1,
                orientation: 'vertical',
@@ -167,7 +151,6 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Gestion des dropdowns du menu ville
    const dropdowns = document.querySelectorAll('.menu-ville__dropdown');
    let activeDropdown = null;
    let activeRestaurant = null;
@@ -177,7 +160,6 @@ window.addEventListener('load', () => {
        const clickElement = dropdown.querySelector('.menu-ville__click');
        const restaurantItems = dropdown.querySelectorAll('.restaurant__item');
 
-       // Gestion des restaurants
        restaurantItems.forEach(restaurant => {
            restaurant.style.height = '6rem';
            const bannerResto = restaurant.querySelector('.banner-resto');
@@ -187,7 +169,6 @@ window.addEventListener('load', () => {
                bannerResto.style.height = '0';
            }
            
-           // Gestion du restaurant item
            restaurant.addEventListener('click', (e) => {
                e.stopPropagation();
                
@@ -209,7 +190,7 @@ window.addEventListener('load', () => {
                        ease: 'power2.inOut'
                    });
                    oldRestaurantLink.classList.add('no-point');
-                   oldRestaurantLinkAbsolute.classList.remove('active'); // Retire active de l'ancien
+                   oldRestaurantLinkAbsolute.classList.remove('active');
                }
 
                const restaurantLink = restaurant.querySelector('.restaurant-link');
@@ -226,7 +207,7 @@ window.addEventListener('load', () => {
                                duration: 0.1
                            });
                            restaurantLink.classList.add('no-point');
-                           restaurantLinkAbsolute.classList.remove('active'); // Retire active à la fermeture
+                           restaurantLinkAbsolute.classList.remove('active');
                        }
                    });
                    activeRestaurant = null;
@@ -245,17 +226,15 @@ window.addEventListener('load', () => {
                    });
                    activeRestaurant = restaurant;
                    restaurantLink.classList.remove('no-point');
-                   restaurantLinkAbsolute.classList.add('active'); // Ajoute active à l'ouverture
+                   restaurantLinkAbsolute.classList.add('active');
                }
            });
 
-           // Gestion du clic sur le lien absolu
            restaurantLinkAbsolute.addEventListener('click', (e) => {
                e.preventDefault();
                e.stopPropagation();
                
                if (restaurant === activeRestaurant) {
-                   // Fade out du restaurant-link
                    const restaurantLink = restaurant.querySelector('.restaurant-link');
                    gsap.to(restaurantLink, {
                        opacity: 0,
@@ -290,11 +269,9 @@ window.addEventListener('load', () => {
            });
        });
 
-       // Gestion du dropdown
        clickElement.addEventListener('click', (e) => {
            e.stopPropagation();
 
-           // Réinitialiser tous les restaurants et bannières
            if (activeRestaurant) {
                const banner = activeRestaurant.querySelector('.banner-resto');
                if (banner) {
@@ -328,7 +305,6 @@ window.addEventListener('load', () => {
                });
                activeDropdown = null;
            } else {
-               // Calculer la hauteur finale avant l'animation
                const finalHeight = dropdown.scrollHeight;
                dropdown.style.height = '8.2rem';
                
