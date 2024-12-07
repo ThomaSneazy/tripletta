@@ -2,8 +2,11 @@ import './styles/style.css'
 import Lenis from '@studio-freight/lenis'
 import gsap from 'gsap'
 import { Observer } from "gsap/Observer";
+import { Flip } from "gsap/Flip";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(Observer);
+gsap.registerPlugin(Flip, ScrollTrigger);
 
 console.log(
     '%c Dev by Thomas Carré\n' + 
@@ -110,8 +113,43 @@ window.addEventListener('load', () => {
        showMenuButton.addEventListener('click', () => {
            if (menuIsOpen) return; 
            menuIsOpen = true;
+           
            mainMenuWrapper.style.display = 'block';
            
+           const tl = gsap.timeline();
+           
+           tl.fromTo(mainMenuWrapper, 
+               { opacity: 0 },
+               { 
+                   opacity: 1,
+                   duration: 0.8,
+                   ease: 'power2.out'
+               }
+           );
+           
+           const lines = mainMenuWrapper.querySelectorAll('.line');
+           const cityNames = mainMenuWrapper.querySelectorAll('.menu-city__name');
+
+           tl.fromTo(lines,
+               { width: 0 },
+               {
+                   width: '100%',
+                   duration: 0.4,
+                   ease: 'power2.out',
+                   stagger: 0.03
+               },
+               '-=0.4'
+           ).fromTo(cityNames,
+               { y: "100%" },
+               {
+                   y: "0%",
+                   duration: 0.4,
+                   ease: 'power2.out',
+                   stagger: 0.03
+               },
+               '<'
+           );
+
            lenisInstance.stop();
 
            mainMenuLenisInstance = new Lenis({
@@ -134,15 +172,25 @@ window.addEventListener('load', () => {
    function closeMenu() {
        if (!menuIsOpen) return;
        
-       lenisInstance.start();
-       
-       if (mainMenuLenisInstance) {
-           mainMenuLenisInstance.destroy();
-           mainMenuLenisInstance = null;
-       }
-       
-       mainMenuWrapper.style.display = 'none';
-       menuIsOpen = false;
+       const tl = gsap.timeline({
+           onComplete: () => {
+               mainMenuWrapper.style.display = 'none';
+               menuIsOpen = false;
+               
+               if (mainMenuLenisInstance) {
+                   mainMenuLenisInstance.destroy();
+                   mainMenuLenisInstance = null;
+               }
+               
+               lenisInstance.start();
+           }
+       });
+
+       tl.to(mainMenuWrapper, {
+           opacity: 0,
+           duration: 0.8,
+           ease: 'power2.out'
+       });
    }
 
    document.addEventListener('keydown', (event) => {
@@ -236,8 +284,16 @@ window.addEventListener('load', () => {
                
                if (restaurant === activeRestaurant) {
                    const restaurantLink = restaurant.querySelector('.restaurant-link');
+                   const lines = restaurant.querySelectorAll('.line');
+                   
                    gsap.to(restaurantLink, {
                        opacity: 0,
+                       duration: 0.8,
+                       ease: 'power2.out'
+                   });
+
+                   gsap.to(lines, {
+                       height: 0,
                        duration: 0.8,
                        ease: 'power2.out'
                    });
@@ -251,13 +307,13 @@ window.addEventListener('load', () => {
                            
                            gsap.to(restaurant, {
                                height: '100vh',
-                               duration: 1.2,
+                               duration: 0.8,
                                ease: 'power2.inOut'
                            });
                            
                            gsap.to(banner, {
                                height: '100%',
-                               duration: 1.2,
+                               duration: 0.8,
                                ease: 'power2.inOut',
                                onComplete: () => {
                                    window.location.href = restaurantLinkAbsolute.getAttribute('href');
@@ -322,5 +378,131 @@ window.addEventListener('load', () => {
                activeDropdown = dropdown;
            }
        });
+   });
+
+   // Configuration du Flip
+   const showMenu = document.querySelector('.show-menu');
+   const starBloc = document.querySelector('.star-bloc');
+   const starBloc2 = document.querySelector('.star-bloc-2');
+   const starBloc3 = document.querySelector('.star-bloc-3');
+   const flipSection = document.querySelector('.flip-1');
+   const flipSection2 = document.querySelector('.flip-2');
+   const gridBgSection = document.querySelector('.flip-3');
+
+   ScrollTrigger.create({
+       trigger: flipSection,
+       start: "top 70%", // 20% from bottom of viewport
+       end: "bottom center",
+       onEnter: () => {
+           const state = Flip.getState(showMenu, {
+               props: "all"
+           });
+           starBloc.appendChild(showMenu);
+           
+           Flip.from(state, {
+               duration: 2,
+               ease: "power2.inOut",
+               absolute: true,
+               scale: true,
+               spin: true,
+           });
+       },
+       onLeaveBack: () => {
+           const state = Flip.getState(showMenu);
+           
+           document.querySelector('.sticky-flip').appendChild(showMenu);
+           
+           Flip.from(state, {
+               duration: 1.5,
+               ease: "power2.inOut",
+               absolute: true,
+               scale: true,
+               spin: true,
+           });
+       }
+   });
+
+   // Nouveau ScrollTrigger pour flip-2
+   ScrollTrigger.create({
+       trigger: flipSection2,
+       start: "top center",
+       end: "bottom center",
+       onEnter: () => {
+           const state = Flip.getState(showMenu, {
+               props: "all"
+           });
+           
+           starBloc2.appendChild(showMenu);
+           
+           Flip.from(state, {
+               duration: 1.5,
+               ease: "power2.inOut",
+               absolute: true,
+               scale: true,
+               spin: true,
+           });
+       },
+       onLeaveBack: () => {
+           const state = Flip.getState(showMenu);
+           
+           starBloc.appendChild(showMenu); // Retour vers star-bloc
+           
+           Flip.from(state, {
+               duration: 1.5,
+               ease: "power2.inOut",
+               absolute: true,
+               scale: true,
+               spin: true,
+           });
+       }
+   });
+
+   // Nouveau ScrollTrigger pour grid__bg__absolute
+   ScrollTrigger.create({
+       trigger: gridBgSection,
+       start: "top center",
+       end: "bottom center",
+       onEnter: () => {
+           const state = Flip.getState(showMenu, {
+               props: "all"
+           });
+           
+           starBloc3.appendChild(showMenu);
+           
+           Flip.from(state, {
+               duration: 2,
+               ease: "power2.inOut",
+               absolute: true,
+               scale: true,
+               spin: true,
+           });
+       },
+       onLeaveBack: () => {
+           const state = Flip.getState(showMenu);
+           
+           starBloc2.appendChild(showMenu);
+           
+           Flip.from(state, {
+               duration: 2,
+               ease: "power2.inOut",
+               absolute: true,
+               scale: true,
+               spin: true,
+           });
+       },
+       onLeave: () => {
+           // Reset sans rotation
+           const state = Flip.getState(showMenu);
+           
+           document.querySelector('.sticky-flip').appendChild(showMenu);
+           
+           Flip.from(state, {
+               duration: 1.5,
+               ease: "power2.inOut",
+               absolute: true,
+               scale: true,
+               spin: true,
+           });
+       }
    });
 });
