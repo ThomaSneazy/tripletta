@@ -295,7 +295,10 @@ window.addEventListener('load', () => {
                    gsap.to(lines, {
                        height: 0,
                        duration: 0.8,
-                       ease: 'power2.out'
+                       ease: 'power2.out',
+                       onStart: () => {
+                           lines.forEach(line => line.style.display = 'none');
+                       }
                    });
 
                    mainMenuLenisInstance.scrollTo(restaurant, {
@@ -312,7 +315,7 @@ window.addEventListener('load', () => {
                            });
                            
                            gsap.to(banner, {
-                               height: '100%',
+                               height: '102%',
                                duration: 0.8,
                                ease: 'power2.inOut',
                                onComplete: () => {
