@@ -494,7 +494,6 @@ window.addEventListener('load', () => {
            });
        },
        onLeave: () => {
-           // Reset sans rotation
            const state = Flip.getState(showMenu);
            
            document.querySelector('.sticky-flip').appendChild(showMenu);
