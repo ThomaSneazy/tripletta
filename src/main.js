@@ -392,11 +392,16 @@ window.addEventListener('load', () => {
    const flipSection2 = document.querySelector('.flip-2');
    const gridBgSection = document.querySelector('.flip-3');
 
+   // Fonction pour vérifier si l'écran est en mode mobile
+   const isMobile = () => window.innerWidth <= 768;
+
+   // Premier ScrollTrigger modifié
    ScrollTrigger.create({
        trigger: flipSection,
-       start: "top 70%", // 20% from bottom of viewport
+       start: "top 70%",
        end: "bottom center",
        onEnter: () => {
+           if (isMobile()) return;
            const state = Flip.getState(showMenu, {
                props: "all"
            });
@@ -411,6 +416,7 @@ window.addEventListener('load', () => {
            });
        },
        onLeaveBack: () => {
+           if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
            document.querySelector('.sticky-flip').appendChild(showMenu);
@@ -425,12 +431,13 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Nouveau ScrollTrigger pour flip-2
+   // Deuxième ScrollTrigger modifié
    ScrollTrigger.create({
        trigger: flipSection2,
        start: "top center",
        end: "bottom center",
        onEnter: () => {
+           if (isMobile()) return;
            const state = Flip.getState(showMenu, {
                props: "all"
            });
@@ -446,6 +453,7 @@ window.addEventListener('load', () => {
            });
        },
        onLeaveBack: () => {
+           if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
            starBloc.appendChild(showMenu); // Retour vers star-bloc
@@ -460,12 +468,13 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Nouveau ScrollTrigger pour grid__bg__absolute
+   // Troisième ScrollTrigger modifié
    ScrollTrigger.create({
        trigger: gridBgSection,
        start: "top center",
        end: "bottom center",
        onEnter: () => {
+           if (isMobile()) return;
            const state = Flip.getState(showMenu, {
                props: "all"
            });
@@ -481,6 +490,7 @@ window.addEventListener('load', () => {
            });
        },
        onLeaveBack: () => {
+           if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
            starBloc2.appendChild(showMenu);
@@ -494,6 +504,7 @@ window.addEventListener('load', () => {
            });
        },
        onLeave: () => {
+           if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
            document.querySelector('.sticky-flip').appendChild(showMenu);
