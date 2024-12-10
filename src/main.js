@@ -47,6 +47,9 @@ let currentLoop = null;
 let currentObserver = null;
 let menuIsOpen = false;
 
+// Ajout d'une fonction utilitaire pour vérifier la taille de l'écran
+const isDesktop = () => window.innerWidth > 991;
+
 window.addEventListener('load', () => {
    document.documentElement.style.setProperty('transition', 'all 0.3s ease-in-out');
    
@@ -108,11 +111,10 @@ window.addEventListener('load', () => {
 
    const mainMenuWrapper = document.querySelector('.menu__wrapper');
    const showMenuButtons = document.querySelectorAll('.show-menu');
-   const closeWrapper = document.querySelector('.close-wrapper');
 
    showMenuButtons.forEach(showMenuButton => {
        showMenuButton.addEventListener('click', () => {
-           if (menuIsOpen || window.innerWidth <= 991) return; 
+           if (menuIsOpen || !isDesktop()) return;
            menuIsOpen = true;
            
            mainMenuWrapper.style.display = 'block';
@@ -128,52 +130,50 @@ window.addEventListener('load', () => {
                }
            );
            
-           if (window.innerWidth > 991) {
-               const lines = mainMenuWrapper.querySelectorAll('.line');
-               const cityNames = mainMenuWrapper.querySelectorAll('.menu-city__name');
+           const lines = mainMenuWrapper.querySelectorAll('.line');
+           const cityNames = mainMenuWrapper.querySelectorAll('.menu-city__name');
 
-               tl.fromTo(lines,
-                   { width: 0 },
-                   {
-                       width: '100%',
-                       duration: 0.4,
-                       ease: 'power2.out',
-                       stagger: 0.03
-                   },
-                   '-=0.4'
-               ).fromTo(cityNames,
-                   { y: "100%" },
-                   {
-                       y: "0%",
-                       duration: 0.4,
-                       ease: 'power2.out',
-                       stagger: 0.03
-                   },
-                   '<'
-               );
+           tl.fromTo(lines,
+               { width: 0 },
+               {
+                   width: '100%',
+                   duration: 0.4,
+                   ease: 'power2.out',
+                   stagger: 0.03
+               },
+               '-=0.4'
+           ).fromTo(cityNames,
+               { y: "100%" },
+               {
+                   y: "0%",
+                   duration: 0.4,
+                   ease: 'power2.out',
+                   stagger: 0.03
+               },
+               '<'
+           );
 
-               lenisInstance.stop();
+           lenisInstance.stop();
 
-               mainMenuLenisInstance = new Lenis({
-                   duration: 1,
-                   orientation: 'vertical',
-                   smoothWheel: true,
-                   smoothTouch: false,
-                   wrapper: mainMenuWrapper,
-                   content: mainMenuWrapper.querySelector('.menu__list__wrapper')
-               });
+           mainMenuLenisInstance = new Lenis({
+               duration: 1,
+               orientation: 'vertical',
+               smoothWheel: true,
+               smoothTouch: false,
+               wrapper: mainMenuWrapper,
+               content: mainMenuWrapper.querySelector('.menu__list__wrapper')
+           });
 
-               function rafMenuScroll(time) {
-                   mainMenuLenisInstance.raf(time);
-                   requestAnimationFrame(rafMenuScroll);
-               }
+           function rafMenuScroll(time) {
+               mainMenuLenisInstance.raf(time);
                requestAnimationFrame(rafMenuScroll);
            }
+           requestAnimationFrame(rafMenuScroll);
        });
    });
 
-   closeWrapper.addEventListener('click', () => {
-       if (!menuIsOpen) return;
+   function closeMenu() {
+       if (!menuIsOpen || !isDesktop()) return;
        
        const tl = gsap.timeline({
            onComplete: () => {
@@ -194,7 +194,7 @@ window.addEventListener('load', () => {
            duration: 0.8,
            ease: 'power2.out'
        });
-   });
+   }
 
    document.addEventListener('keydown', (event) => {
        if (event.key === 'Escape') {
@@ -202,191 +202,191 @@ window.addEventListener('load', () => {
        }
    });
 
-   if (window.innerWidth > 991) {
-       const dropdowns = document.querySelectorAll('.menu-ville__dropdown');
-       let activeDropdown = null;
-       let activeRestaurant = null;
+   const dropdowns = document.querySelectorAll('.menu-ville__dropdown');
+   let activeDropdown = null;
+   let activeRestaurant = null;
 
-       dropdowns.forEach(dropdown => {
-           dropdown.style.height = '8.2rem';
-           const clickElement = dropdown.querySelector('.menu-ville__click');
-           const restaurantItems = dropdown.querySelectorAll('.restaurant__item');
+   dropdowns.forEach(dropdown => {
+       if (!isDesktop()) return;
+       
+       dropdown.style.height = '8.2rem';
+       const clickElement = dropdown.querySelector('.menu-ville__click');
+       const restaurantItems = dropdown.querySelectorAll('.restaurant__item');
 
-           restaurantItems.forEach(restaurant => {
-               restaurant.style.height = '6rem';
-               const bannerResto = restaurant.querySelector('.banner-resto');
-               const restaurantLinkAbsolute = restaurant.querySelector('.restaurant-link-absolute');
-               
-               if (bannerResto) {
-                   bannerResto.style.height = '0';
-               }
-               
-               restaurant.addEventListener('click', (e) => {
-                   e.stopPropagation();
-                   
-                   if (activeRestaurant && activeRestaurant !== restaurant) {
-                       const oldBanner = activeRestaurant.querySelector('.banner-resto');
-                       const oldRestaurantLink = activeRestaurant.querySelector('.restaurant-link');
-                       const oldRestaurantLinkAbsolute = activeRestaurant.querySelector('.restaurant-link-absolute');
-                       
-                       if (oldBanner) {
-                           gsap.to(oldBanner, {
-                               height: '0',
-                               duration: 0.8,
-                               ease: 'power2.inOut'
-                           });
-                       }
-                       gsap.to(activeRestaurant, {
-                           height: '6rem',
-                           duration: 0.8,
-                           ease: 'power2.inOut'
-                       });
-                       oldRestaurantLink.classList.add('no-point');
-                       oldRestaurantLinkAbsolute.classList.remove('active');
-                   }
-
-                   const restaurantLink = restaurant.querySelector('.restaurant-link');
-                   
-                   if (activeRestaurant === restaurant) {
-                       const banner = restaurant.querySelector('.banner-resto');
-                       gsap.to([restaurant, banner], {
-                           height: '6rem',
-                           duration: 0.8,
-                           ease: 'power2.inOut',
-                           onComplete: () => {
-                               gsap.to(dropdown, {
-                                   height: 'auto',
-                                   duration: 0.1
-                               });
-                               restaurantLink.classList.add('no-point');
-                               restaurantLinkAbsolute.classList.remove('active');
-                           }
-                       });
-                       activeRestaurant = null;
-                   } else {
-                       const banner = restaurant.querySelector('.banner-resto');
-                       gsap.to([restaurant, banner], {
-                           height: '60vh',
-                           duration: 0.8,
-                           ease: 'power2.inOut',
-                           onComplete: () => {
-                               gsap.to(dropdown, {
-                                   height: 'auto',
-                                   duration: 0.1
-                               });
-                           }
-                       });
-                       activeRestaurant = restaurant;
-                       restaurantLink.classList.remove('no-point');
-                       restaurantLinkAbsolute.classList.add('active');
-                   }
-               });
-
-               restaurantLinkAbsolute.addEventListener('click', (e) => {
-                   e.preventDefault();
-                   e.stopPropagation();
-                   
-                   if (restaurant === activeRestaurant) {
-                       const restaurantLink = restaurant.querySelector('.restaurant-link');
-                       const lines = restaurant.querySelectorAll('.line');
-                       
-                       gsap.to(restaurantLink, {
-                           opacity: 0,
-                           duration: 0.8,
-                           ease: 'power2.out'
-                       });
-
-                       gsap.to(lines, {
-                           height: 0,
-                           duration: 0.8,
-                           ease: 'power2.out',
-                           onStart: () => {
-                               lines.forEach(line => line.style.display = 'none');
-                           }
-                       });
-
-                       mainMenuLenisInstance.scrollTo(restaurant, {
-                           offset: 0,
-                           duration: 1,
-                           immediate: false,
-                           onComplete: () => {
-                               const banner = restaurant.querySelector('.banner-resto');
-                               
-                               gsap.to(restaurant, {
-                                   height: '100vh',
-                                   duration: 0.8,
-                                   ease: 'power2.inOut'
-                               });
-                               
-                               gsap.to(banner, {
-                                   height: '102%',
-                                   duration: 0.8,
-                                   ease: 'power2.inOut',
-                                   onComplete: () => {
-                                       window.location.href = restaurantLinkAbsolute.getAttribute('href');
-                                   }
-                               });
-                           }
-                       });
-                   }
-               });
-           });
-
-           clickElement.addEventListener('click', (e) => {
+       restaurantItems.forEach(restaurant => {
+           restaurant.style.height = '6rem';
+           const bannerResto = restaurant.querySelector('.banner-resto');
+           const restaurantLinkAbsolute = restaurant.querySelector('.restaurant-link-absolute');
+           
+           if (bannerResto) {
+               bannerResto.style.height = '0';
+           }
+           
+           restaurant.addEventListener('click', (e) => {
                e.stopPropagation();
-
-               if (activeRestaurant) {
-                   const banner = activeRestaurant.querySelector('.banner-resto');
-                   if (banner) {
-                       gsap.to(banner, {
+               
+               if (activeRestaurant && activeRestaurant !== restaurant) {
+                   const oldBanner = activeRestaurant.querySelector('.banner-resto');
+                   const oldRestaurantLink = activeRestaurant.querySelector('.restaurant-link');
+                   const oldRestaurantLinkAbsolute = activeRestaurant.querySelector('.restaurant-link-absolute');
+                   
+                   if (oldBanner) {
+                       gsap.to(oldBanner, {
                            height: '0',
                            duration: 0.8,
                            ease: 'power2.inOut'
                        });
                    }
                    gsap.to(activeRestaurant, {
-                       height: '8.2rem',
+                       height: '6rem',
                        duration: 0.8,
                        ease: 'power2.inOut'
+                   });
+                   oldRestaurantLink.classList.add('no-point');
+                   oldRestaurantLinkAbsolute.classList.remove('active');
+               }
+
+               const restaurantLink = restaurant.querySelector('.restaurant-link');
+               
+               if (activeRestaurant === restaurant) {
+                   const banner = restaurant.querySelector('.banner-resto');
+                   gsap.to([restaurant, banner], {
+                       height: '6rem',
+                       duration: 0.8,
+                       ease: 'power2.inOut',
+                       onComplete: () => {
+                           gsap.to(dropdown, {
+                               height: 'auto',
+                               duration: 0.1
+                           });
+                           restaurantLink.classList.add('no-point');
+                           restaurantLinkAbsolute.classList.remove('active');
+                       }
                    });
                    activeRestaurant = null;
-               }
-
-               if (activeDropdown && activeDropdown !== dropdown) {
-                   gsap.to(activeDropdown, {
-                       height: '8.2rem',
-                       duration: 0.8,
-                       ease: 'power2.inOut'
-                   });
-               }
-
-               if (activeDropdown === dropdown) {
-                   gsap.to(dropdown, {
-                       height: '8.2rem',
-                       duration: 0.8,
-                       ease: 'power2.inOut'
-                   });
-                   activeDropdown = null;
                } else {
-                   const finalHeight = dropdown.scrollHeight;
-                   dropdown.style.height = '8.2rem';
-                   
-                   gsap.fromTo(dropdown, 
-                       { height: '8.2rem' },
-                       {
-                           height: finalHeight,
-                           duration: 0.8,
-                           ease: 'power2.inOut',
-                           onComplete: () => {
-                               dropdown.style.height = 'auto';
-                           }
+                   const banner = restaurant.querySelector('.banner-resto');
+                   gsap.to([restaurant, banner], {
+                       height: '60vh',
+                       duration: 0.8,
+                       ease: 'power2.inOut',
+                       onComplete: () => {
+                           gsap.to(dropdown, {
+                               height: 'auto',
+                               duration: 0.1
+                           });
                        }
-                   );
-                   activeDropdown = dropdown;
+                   });
+                   activeRestaurant = restaurant;
+                   restaurantLink.classList.remove('no-point');
+                   restaurantLinkAbsolute.classList.add('active');
+               }
+           });
+
+           restaurantLinkAbsolute.addEventListener('click', (e) => {
+               e.preventDefault();
+               e.stopPropagation();
+               
+               if (restaurant === activeRestaurant) {
+                   const restaurantLink = restaurant.querySelector('.restaurant-link');
+                   const lines = restaurant.querySelectorAll('.line');
+                   
+                   gsap.to(restaurantLink, {
+                       opacity: 0,
+                       duration: 0.8,
+                       ease: 'power2.out'
+                   });
+
+                   gsap.to(lines, {
+                       height: 0,
+                       duration: 0.8,
+                       ease: 'power2.out',
+                       onStart: () => {
+                           lines.forEach(line => line.style.display = 'none');
+                       }
+                   });
+
+                   mainMenuLenisInstance.scrollTo(restaurant, {
+                       offset: 0,
+                       duration: 1,
+                       immediate: false,
+                       onComplete: () => {
+                           const banner = restaurant.querySelector('.banner-resto');
+                           
+                           gsap.to(restaurant, {
+                               height: '100vh',
+                               duration: 0.8,
+                               ease: 'power2.inOut'
+                           });
+                           
+                           gsap.to(banner, {
+                               height: '102%',
+                               duration: 0.8,
+                               ease: 'power2.inOut',
+                               onComplete: () => {
+                                   window.location.href = restaurantLinkAbsolute.getAttribute('href');
+                               }
+                           });
+                       }
+                   });
                }
            });
        });
-   }
+
+       clickElement.addEventListener('click', (e) => {
+           e.stopPropagation();
+
+           if (activeRestaurant) {
+               const banner = activeRestaurant.querySelector('.banner-resto');
+               if (banner) {
+                   gsap.to(banner, {
+                       height: '0',
+                       duration: 0.8,
+                       ease: 'power2.inOut'
+                   });
+               }
+               gsap.to(activeRestaurant, {
+                   height: '8.2rem',
+                   duration: 0.8,
+                   ease: 'power2.inOut'
+               });
+               activeRestaurant = null;
+           }
+
+           if (activeDropdown && activeDropdown !== dropdown) {
+               gsap.to(activeDropdown, {
+                   height: '8.2rem',
+                   duration: 0.8,
+                   ease: 'power2.inOut'
+               });
+           }
+
+           if (activeDropdown === dropdown) {
+               gsap.to(dropdown, {
+                   height: '8.2rem',
+                   duration: 0.8,
+                   ease: 'power2.inOut'
+               });
+               activeDropdown = null;
+           } else {
+               const finalHeight = dropdown.scrollHeight;
+               dropdown.style.height = '8.2rem';
+               
+               gsap.fromTo(dropdown, 
+                   { height: '8.2rem' },
+                   {
+                       height: finalHeight,
+                       duration: 0.8,
+                       ease: 'power2.inOut',
+                       onComplete: () => {
+                           dropdown.style.height = 'auto';
+                       }
+                   }
+               );
+               activeDropdown = dropdown;
+           }
+       });
+   });
 
    // Configuration du Flip
    const showMenu = document.querySelector('.show-menu');
