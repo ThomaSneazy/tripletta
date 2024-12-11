@@ -369,6 +369,9 @@ window.addEventListener('load', () => {
 
            if (activeRestaurant) {
                const banner = activeRestaurant.querySelector('.banner-resto');
+               const restaurantLinkAbsolute = activeRestaurant.querySelector('.restaurant-link-absolute');
+               const restaurantLink = activeRestaurant.querySelector('.restaurant-link');
+               
                if (banner) {
                    gsap.to(banner, {
                        height: '0',
@@ -377,10 +380,14 @@ window.addEventListener('load', () => {
                    });
                }
                gsap.to(activeRestaurant, {
-                   height: '8.2rem',
+                   height: '6rem',
                    duration: 0.8,
                    ease: 'power2.inOut'
                });
+               
+               restaurantLinkAbsolute.classList.remove('active');
+               restaurantLink.classList.add('no-point');
+               
                activeRestaurant = null;
            }
 
