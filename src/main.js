@@ -47,9 +47,6 @@ let currentLoop = null;
 let currentObserver = null;
 let menuIsOpen = false;
 
-// Ajout d'une fonction utilitaire pour vérifier la taille de l'écran
-const isDesktop = () => window.innerWidth > 991;
-
 window.addEventListener('load', () => {
    document.documentElement.style.setProperty('transition', 'all 0.3s ease-in-out');
    
@@ -114,7 +111,7 @@ window.addEventListener('load', () => {
 
    showMenuButtons.forEach(showMenuButton => {
        showMenuButton.addEventListener('click', () => {
-           if (menuIsOpen || !isDesktop()) return;
+           if (menuIsOpen) return; 
            menuIsOpen = true;
            
            mainMenuWrapper.style.display = 'block';
@@ -173,7 +170,7 @@ window.addEventListener('load', () => {
    });
 
    function closeMenu() {
-       if (!menuIsOpen || !isDesktop()) return;
+       if (!menuIsOpen) return;
        
        const tl = gsap.timeline({
            onComplete: () => {
@@ -207,8 +204,6 @@ window.addEventListener('load', () => {
    let activeRestaurant = null;
 
    dropdowns.forEach(dropdown => {
-       if (!isDesktop()) return;
-       
        dropdown.style.height = '8.2rem';
        const clickElement = dropdown.querySelector('.menu-ville__click');
        const restaurantItems = dropdown.querySelectorAll('.restaurant__item');
@@ -397,16 +392,11 @@ window.addEventListener('load', () => {
    const flipSection2 = document.querySelector('.flip-2');
    const gridBgSection = document.querySelector('.flip-3');
 
-   // Fonction pour vérifier si l'écran est en mode mobile
-   const isMobile = () => window.innerWidth <= 768;
-
-   // Premier ScrollTrigger modifié
    ScrollTrigger.create({
        trigger: flipSection,
-       start: "top 70%",
+       start: "top 70%", // 20% from bottom of viewport
        end: "bottom center",
        onEnter: () => {
-           if (isMobile()) return;
            const state = Flip.getState(showMenu, {
                props: "all"
            });
@@ -421,7 +411,6 @@ window.addEventListener('load', () => {
            });
        },
        onLeaveBack: () => {
-           if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
            document.querySelector('.sticky-flip').appendChild(showMenu);
@@ -436,13 +425,12 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Deuxième ScrollTrigger modifié
+   // Nouveau ScrollTrigger pour flip-2
    ScrollTrigger.create({
        trigger: flipSection2,
        start: "top center",
        end: "bottom center",
        onEnter: () => {
-           if (isMobile()) return;
            const state = Flip.getState(showMenu, {
                props: "all"
            });
@@ -458,7 +446,6 @@ window.addEventListener('load', () => {
            });
        },
        onLeaveBack: () => {
-           if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
            starBloc.appendChild(showMenu); // Retour vers star-bloc
@@ -473,13 +460,12 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Troisième ScrollTrigger modifié
+   // Nouveau ScrollTrigger pour grid__bg__absolute
    ScrollTrigger.create({
        trigger: gridBgSection,
        start: "top center",
        end: "bottom center",
        onEnter: () => {
-           if (isMobile()) return;
            const state = Flip.getState(showMenu, {
                props: "all"
            });
@@ -495,7 +481,6 @@ window.addEventListener('load', () => {
            });
        },
        onLeaveBack: () => {
-           if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
            starBloc2.appendChild(showMenu);
@@ -509,7 +494,6 @@ window.addEventListener('load', () => {
            });
        },
        onLeave: () => {
-           if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
            document.querySelector('.sticky-flip').appendChild(showMenu);
