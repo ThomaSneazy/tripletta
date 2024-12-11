@@ -403,8 +403,7 @@ window.addEventListener('load', () => {
        onEnter: () => {
            if (isMobile()) return;
            const state = Flip.getState(showMenu, {
-               props: "all",
-               absolute: true
+               props: "all"
            });
            starBloc.appendChild(showMenu);
            
@@ -414,7 +413,6 @@ window.addEventListener('load', () => {
                absolute: true,
                scale: true,
                spin: true,
-               nested: true
            });
        },
        onLeaveBack: () => {
@@ -433,16 +431,15 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Deuxième ScrollTrigger modifié
    ScrollTrigger.create({
        trigger: flipSection2,
-       start: "top 70%",
+       start: "top center",
        end: "bottom center",
+    //    markers: true, 
        onEnter: () => {
            if (isMobile()) return;
            const state = Flip.getState(showMenu, {
-               props: "all",
-               absolute: true
+               props: "all"
            });
            
            starBloc2.appendChild(showMenu);
@@ -453,10 +450,6 @@ window.addEventListener('load', () => {
                absolute: true,
                scale: true,
                spin: true,
-               nested: true,
-               onComplete: () => {
-                   showMenu.style.transform = 'none';
-               }
            });
        },
        onLeaveBack: () => {
@@ -480,6 +473,7 @@ window.addEventListener('load', () => {
        trigger: gridBgSection,
        start: "top center",
        end: "bottom center",
+    //    markers: true, 
        onEnter: () => {
            if (isMobile()) return;
            const state = Flip.getState(showMenu, {
