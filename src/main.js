@@ -242,17 +242,20 @@ window.addEventListener('load', () => {
    let activeRestaurant = null;
 
    dropdowns.forEach(dropdown => {
-       dropdown.style.height = '8.2rem';
+       if (window.innerWidth > 991) {
+           dropdown.style.height = '8.2rem';
+       }
+       
        const clickElement = dropdown.querySelector('.menu-ville__click');
        const restaurantItems = dropdown.querySelectorAll('.restaurant__item');
 
        restaurantItems.forEach(restaurant => {
-           restaurant.style.height = '6rem';
-           const bannerResto = restaurant.querySelector('.banner-resto');
-           const restaurantLinkAbsolute = restaurant.querySelector('.restaurant-link-absolute');
-           
-           if (bannerResto) {
-               bannerResto.style.height = '0';
+           if (window.innerWidth > 991) {
+               restaurant.style.height = '6rem';
+               const bannerResto = restaurant.querySelector('.banner-resto');
+               if (bannerResto) {
+                   bannerResto.style.height = '0';
+               }
            }
            
            restaurant.addEventListener('click', (e) => {
@@ -260,24 +263,26 @@ window.addEventListener('load', () => {
                e.stopPropagation();
                
                if (activeRestaurant && activeRestaurant !== restaurant) {
-                   const oldBanner = activeRestaurant.querySelector('.banner-resto');
-                   const oldRestaurantLink = activeRestaurant.querySelector('.restaurant-link');
-                   const oldRestaurantLinkAbsolute = activeRestaurant.querySelector('.restaurant-link-absolute');
-                   
-                   if (oldBanner) {
-                       gsap.to(oldBanner, {
-                           height: '0',
+                   if (window.innerWidth > 991) {
+                       const oldBanner = activeRestaurant.querySelector('.banner-resto');
+                       const oldRestaurantLink = activeRestaurant.querySelector('.restaurant-link');
+                       const oldRestaurantLinkAbsolute = activeRestaurant.querySelector('.restaurant-link-absolute');
+                       
+                       if (oldBanner) {
+                           gsap.to(oldBanner, {
+                               height: '0',
+                               duration: 0.8,
+                               ease: 'power2.inOut'
+                           });
+                       }
+                       gsap.to(activeRestaurant, {
+                           height: '6rem',
                            duration: 0.8,
                            ease: 'power2.inOut'
                        });
+                       oldRestaurantLink.classList.add('no-point');
+                       oldRestaurantLinkAbsolute.classList.remove('active');
                    }
-                   gsap.to(activeRestaurant, {
-                       height: '6rem',
-                       duration: 0.8,
-                       ease: 'power2.inOut'
-                   });
-                   oldRestaurantLink.classList.add('no-point');
-                   oldRestaurantLinkAbsolute.classList.remove('active');
                }
 
                const restaurantLink = restaurant.querySelector('.restaurant-link');
@@ -317,7 +322,9 @@ window.addEventListener('load', () => {
                }
            });
 
+           const restaurantLinkAbsolute = restaurant.querySelector('.restaurant-link-absolute');
            restaurantLinkAbsolute.addEventListener('click', (e) => {
+               if (window.innerWidth <= 991) return;
                e.preventDefault();
                e.stopPropagation();
                
@@ -604,6 +611,37 @@ window.addEventListener('load', () => {
                pauseBtn.style.display = 'none';
            }
        });
+   });
+
+   // Ajouter un écouteur de redimensionnement pour réinitialiser les styles
+   window.addEventListener('resize', () => {
+       if (window.innerWidth <= 991) {
+           // Réinitialiser tous les styles appliqués par JS
+           dropdowns.forEach(dropdown => {
+               dropdown.style.height = '';
+               const restaurantItems = dropdown.querySelectorAll('.restaurant__item');
+               restaurantItems.forEach(restaurant => {
+                   restaurant.style.height = '';
+                   const bannerResto = restaurant.querySelector('.banner-resto');
+                   if (bannerResto) {
+                       bannerResto.style.height = '';
+                   }
+                   const restaurantLink = restaurant.querySelector('.restaurant-link');
+                   const restaurantLinkAbsolute = restaurant.querySelector('.restaurant-link-absolute');
+                   if (restaurantLink) restaurantLink.classList.remove('no-point');
+                   if (restaurantLinkAbsolute) restaurantLinkAbsolute.classList.remove('active');
+               });
+           });
+           
+           // Réinitialiser les instances et états
+           if (mainMenuLenisInstance) {
+               mainMenuLenisInstance.destroy();
+               mainMenuLenisInstance = null;
+           }
+           menuIsOpen = false;
+           activeDropdown = null;
+           activeRestaurant = null;
+       }
    });
 });
 
