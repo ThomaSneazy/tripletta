@@ -147,6 +147,7 @@ window.addEventListener('load', () => {
 
    showMenuButtons.forEach(showMenuButton => {
        showMenuButton.addEventListener('click', () => {
+           if (window.innerWidth <= 991) return;
            if (menuIsOpen) return; 
            menuIsOpen = true;
            
@@ -206,6 +207,7 @@ window.addEventListener('load', () => {
    });
 
    function closeMenu() {
+       if (window.innerWidth <= 991) return;
        if (!menuIsOpen) return;
        
        const tl = gsap.timeline({
@@ -254,6 +256,7 @@ window.addEventListener('load', () => {
            }
            
            restaurant.addEventListener('click', (e) => {
+               if (window.innerWidth <= 991) return;
                e.stopPropagation();
                
                if (activeRestaurant && activeRestaurant !== restaurant) {
@@ -365,6 +368,7 @@ window.addEventListener('load', () => {
        });
 
        clickElement.addEventListener('click', (e) => {
+           if (window.innerWidth <= 991) return;
            e.stopPropagation();
 
            if (activeRestaurant) {
@@ -426,7 +430,6 @@ window.addEventListener('load', () => {
        });
    });
 
-   // Configuration du Flip
    const showMenu = document.querySelector('.show-menu');
    const starBloc = document.querySelector('.star-bloc');
    const starBloc2 = document.querySelector('.star-bloc-2');
@@ -435,10 +438,8 @@ window.addEventListener('load', () => {
    const flipSection2 = document.querySelector('.flip-2');
    const gridBgSection = document.querySelector('.flip-3');
 
-   // Fonction pour vérifier si l'écran est en mode mobile
    const isMobile = () => window.innerWidth <= 768;
 
-   // Premier ScrollTrigger modifié
    ScrollTrigger.create({
        trigger: flipSection,
        start: "top 70%",
@@ -499,7 +500,7 @@ window.addEventListener('load', () => {
            if (isMobile()) return;
            const state = Flip.getState(showMenu);
            
-           starBloc.appendChild(showMenu); // Retour vers star-bloc
+           starBloc.appendChild(showMenu); 
            
            Flip.from(state, {
                duration: 1.5,
@@ -511,7 +512,6 @@ window.addEventListener('load', () => {
        }
    });
 
-   // Troisième ScrollTrigger modifié
    ScrollTrigger.create({
        trigger: gridBgSection,
        start: "top center",
