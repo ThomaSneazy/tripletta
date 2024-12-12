@@ -98,7 +98,7 @@ window.addEventListener('load', () => {
                }
            });
        }, (loaderItems.length - 1) * 300);
-   }, 300);
+   }, 150);
 
    document.documentElement.style.setProperty('transition', 'all 0.3s ease-in-out');
    
