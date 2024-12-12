@@ -27,18 +27,22 @@ let currentColorIndex = 0;
 
 const colorPalettes = [
     {
+        // Rose clair et rouge foncé
         light: '#f9cfe7',
         dark: '#C7361C'   
     },
     {
+        // Bleu clair et bleu foncé
         light: '#d3edef',
         dark: '#314b98'   
     },
     {
+        // Orange et jaune
         light: '#ff6a00',
         dark: '#f8da52'   
     },
     {
+        // Vert clair et vert foncé
         light: '#bdd0a0',
         dark: '#004632'   
     }
@@ -56,7 +60,6 @@ window.addEventListener('load', () => {
    const loaderWrapper = document.querySelector('.loader__wrapper');
    const loaderItems = document.querySelectorAll('.loader__item');
    
-   // Initialiser Lenis
    lenisInstance = new Lenis({
       duration: 1,
       orientation: 'vertical',
@@ -112,7 +115,7 @@ window.addEventListener('load', () => {
        const footer = document.querySelector('.section.footer');
        const footerTop = footer.getBoundingClientRect().top;
        const footerHeight = footer.offsetHeight;
-       const triggerPoint = window.innerHeight - (footerHeight * 0.9);
+       const triggerPoint = window.innerHeight - (footerHeight * 0.5);
        
        if (footerTop <= triggerPoint && !hasChangedColors) {
            const root = document.documentElement;
@@ -613,10 +616,8 @@ window.addEventListener('load', () => {
        });
    });
 
-   // Ajouter un écouteur de redimensionnement pour réinitialiser les styles
    window.addEventListener('resize', () => {
        if (window.innerWidth <= 991) {
-           // Réinitialiser tous les styles appliqués par JS
            dropdowns.forEach(dropdown => {
                dropdown.style.height = '';
                const restaurantItems = dropdown.querySelectorAll('.restaurant__item');
@@ -633,7 +634,6 @@ window.addEventListener('load', () => {
                });
            });
            
-           // Réinitialiser les instances et états
            if (mainMenuLenisInstance) {
                mainMenuLenisInstance.destroy();
                mainMenuLenisInstance = null;
