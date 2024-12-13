@@ -63,7 +63,7 @@ const colorPalettes = [
     },
     {
         // Crème pâle et turquoise foncé
-        light: '#FEF8DD', // Blanc cassé chaleureux
+        light: '#D7B557', // Blanc cassé chaleureux
         dark: '#00777D'   // Turquoise profond
     },
     {
@@ -78,7 +78,7 @@ const colorPalettes = [
     },
     {
         // Crème pâle et bleu marine
-        light: '#FEF8DD', // Blanc cassé chaleureux
+        light: '#BDD0A0', // Blanc cassé chaleureux
         dark: '#314B98'   // Bleu profond
     },
     {
