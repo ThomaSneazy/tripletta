@@ -28,8 +28,8 @@ let currentColorIndex = 0;
 const colorPalettes = [
     {
         // Rose clair et rouge foncé
-        light: '#f9cfe7',
-        dark: '#C7361C'   
+        light: '#CEE9EB',
+        dark: '#00777D'   
     },
     {
         // Bleu clair et bleu foncé
