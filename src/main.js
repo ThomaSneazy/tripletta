@@ -27,24 +27,69 @@ let currentColorIndex = 0;
 
 const colorPalettes = [
     {
-        // Rose clair et rouge foncé
-        light: '#CEE9EB',
-        dark: '#00777D'   
+        // Bleu-vert très pâle (turquoise clair) et turquoise foncé
+        light: '#CEE9EB', // Couleur douce et apaisante
+        dark: '#00777D'   // Turquoise profond
     },
     {
-        // Bleu clair et bleu foncé
-        light: '#d3edef',
-        dark: '#314b98'   
+        // Jaune pâle et orange doré
+        light: '#FFEEB2', // Jaune crémeux et lumineux
+        dark: '#EFAF00'   // Or chaleureux
     },
     {
-        // Orange et jaune
-        light: '#ff6a00',
-        dark: '#f8da52'   
+        // Lavande pâle et violet royal
+        light: '#CECBFF', // Violet très doux
+        dark: '#603198'   // Violet profond et riche
     },
     {
-        // Vert clair et vert foncé
-        light: '#bdd0a0',
-        dark: '#004632'   
+        // Rose pâle (même couleur pour light et dark)
+        light: '#F9CEE1', // Rose tendre
+        dark: '#F9CEE1'   // Rose tendre identique
+    },
+    {
+        // Bleu glacier et bleu marine
+        light: '#E0F5FF', // Bleu très clair, presque blanc
+        dark: '#314B98'   // Bleu profond
+    },
+    {
+        // Crème pâle et orange vif
+        light: '#FEF8DD', // Blanc cassé chaleureux
+        dark: '#FF6A00'   // Orange éclatant
+    },
+    {
+        // Bleu glacier et rouge brique
+        light: '#E0F5FF', // Bleu très clair, presque blanc
+        dark: '#C7361C'   // Rouge terre cuite
+    },
+    {
+        // Crème pâle et turquoise foncé
+        light: '#FEF8DD', // Blanc cassé chaleureux
+        dark: '#00777D'   // Turquoise profond
+    },
+    {
+        // Vert olive clair et violet royal
+        light: '#BDD0A0', // Vert sage doux
+        dark: '#603198'   // Violet profond et riche
+    },
+    {
+        // Jaune pâle et orange vif
+        light: '#FFEEB2', // Jaune crémeux et lumineux
+        dark: '#FF6A00'   // Orange éclatant
+    },
+    {
+        // Crème pâle et bleu marine
+        light: '#FEF8DD', // Blanc cassé chaleureux
+        dark: '#314B98'   // Bleu profond
+    },
+    {
+        // Rose pâle et vert forêt
+        light: '#F9CEE1', // Rose tendre
+        dark: '#004632'   // Vert foncé profond
+    },
+    {
+        // Bleu glacier et vert forêt
+        light: '#E0F5FF', // Bleu très clair, presque blanc
+        dark: '#004632'   // Vert foncé profond
     }
 ];
 
