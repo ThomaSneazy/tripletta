@@ -53,7 +53,7 @@ const colorPalettes = [
     },
     {
         // Crème pâle et orange vif
-        light: '#FEF8DD', // Blanc cassé chaleureux
+        light: '#F9CEE1', // Blanc cassé chaleureux
         dark: '#FF6A00'   // Orange éclatant
     },
     {
