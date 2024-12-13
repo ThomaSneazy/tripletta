@@ -44,7 +44,7 @@ const colorPalettes = [
     {
         // Rose pâle (même couleur pour light et dark)
         light: '#F9CEE1', // Rose tendre
-        dark: '#F9CEE1'   // Rose tendre identique
+        dark: '#C7361C'   // Rose tendre identique
     },
     {
         // Bleu glacier et bleu marine
