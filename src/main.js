@@ -105,11 +105,11 @@ window.addEventListener('load', () => {
 
    document.documentElement.style.setProperty('transition', 'all 0.3s ease-in-out');
    
-   const svgs = document.querySelectorAll('svg');
-   svgs.forEach(svg => {
-       svg.style.transition = 'all 0.3s ease-in-out';
-       svg.style.willChange = 'transform';
-   });
+//    const svgs = document.querySelectorAll('svg');
+//    svgs.forEach(svg => {
+//        svg.style.transition = 'all 0.3s ease-in-out';
+//        svg.style.willChange = 'transform';
+//    });
 
    lenisInstance.on('scroll', () => {
        const footer = document.querySelector('.section.footer');
