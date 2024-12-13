@@ -90,6 +90,11 @@ const colorPalettes = [
         // Bleu glacier et vert forêt
         light: '#E0F5FF', // Bleu très clair, presque blanc
         dark: '#004632'   // Vert foncé profond
+    },
+    {
+        // Bleu glacier et vert forêt
+        light: '#BDD0A0', // Bleu très clair, presque blanc
+        dark: '#004632'   // Vert foncé profond
     }
 ];
 
