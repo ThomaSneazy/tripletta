@@ -107,6 +107,12 @@ window.addEventListener('load', () => {
    const loaderWrapper = document.querySelector('.loader__wrapper');
    const loaderItems = document.querySelectorAll('.loader__item');
    
+   // Vérifier si nous sommes dans l'éditeur Webflow
+   if (window.Webflow && window.Webflow.env('editor')) {
+       console.log('Mode éditeur Webflow détecté - Lenis désactivé');
+       return; // Sortir de la fonction si nous sommes dans l'éditeur
+   }
+   
    lenisInstance = new Lenis({
       duration: 1,
       orientation: 'vertical',
