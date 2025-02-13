@@ -385,6 +385,20 @@ window.addEventListener('load', () => {
                if (window.innerWidth <= 991) return;
                cursor.style.display = 'block';
                
+               // Animation d'entrée du curseur
+               gsap.fromTo(cursor, 
+                   { 
+                       scale: 0, 
+                       opacity: 0 
+                   },
+                   { 
+                       scale: 1, 
+                       opacity: 1, 
+                       duration: 0.6,
+                       ease: "elastic.out(1, 0.9)" // Léger rebond
+                   }
+               );
+               
                const followCursor = (e) => {
                    const rect = restaurantLinkAbsolute.getBoundingClientRect();
                    const cursorRect = cursor.getBoundingClientRect();
@@ -394,7 +408,7 @@ window.addEventListener('load', () => {
                    gsap.to(cursor, {
                        x: e.clientX - rect.left - (cursorWidth / 2),
                        y: e.clientY - rect.top - (cursorHeight / 2),
-                       duration: 0.2,
+                       duration: 0.4, // Durée augmentée pour plus de smoothness
                        ease: 'power2.out'
                    });
                };
@@ -402,7 +416,18 @@ window.addEventListener('load', () => {
                restaurantLinkAbsolute.addEventListener('mousemove', followCursor);
                restaurantLinkAbsolute.addEventListener('mouseleave', () => {
                    if (window.innerWidth <= 991) return;
-                   cursor.style.display = 'none';
+                   
+                   // Animation de sortie du curseur
+                   gsap.to(cursor, {
+                       scale: 0,
+                       opacity: 0,
+                       duration: 0.4,
+                       ease: "power2.out",
+                       onComplete: () => {
+                           cursor.style.display = 'none';
+                       }
+                   });
+                   
                    restaurantLinkAbsolute.removeEventListener('mousemove', followCursor);
                }, { once: true });
            });
