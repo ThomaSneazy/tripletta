@@ -428,6 +428,32 @@ window.addEventListener('load', () => {
                    });
                }
            });
+
+           // Ajout du suivi du curseur
+           const cursor = document.querySelector('.cursor');
+           
+           restaurantLinkAbsolute.addEventListener('mouseenter', () => {
+               if (window.innerWidth <= 991) return;
+               cursor.style.display = 'block';
+               
+               document.addEventListener('mousemove', followCursor);
+           });
+
+           restaurantLinkAbsolute.addEventListener('mouseleave', () => {
+               if (window.innerWidth <= 991) return;
+               cursor.style.display = 'none';
+               
+               document.removeEventListener('mousemove', followCursor);
+           });
+
+           function followCursor(e) {
+               gsap.to(cursor, {
+                   x: e.clientX,
+                   y: e.clientY,
+                   duration: 0.2,
+                   ease: 'power2.out'
+               });
+           }
        });
 
        clickElement.addEventListener('click', (e) => {
@@ -697,4 +723,6 @@ window.addEventListener('load', () => {
        }
    });
 });
+
+
 
