@@ -379,6 +379,30 @@ window.addEventListener('load', () => {
            });
 
            const restaurantLinkAbsolute = restaurant.querySelector('.restaurant-link-absolute');
+           const cursor = restaurantLinkAbsolute.querySelector('.cursor');
+           
+           restaurantLinkAbsolute.addEventListener('mouseenter', () => {
+               if (window.innerWidth <= 991) return;
+               cursor.style.display = 'block';
+               
+               const followCursor = (e) => {
+                   const rect = restaurantLinkAbsolute.getBoundingClientRect();
+                   gsap.to(cursor, {
+                       x: e.clientX - rect.left,
+                       y: e.clientY - rect.top,
+                       duration: 0.2,
+                       ease: 'power2.out'
+                   });
+               };
+               
+               restaurantLinkAbsolute.addEventListener('mousemove', followCursor);
+               restaurantLinkAbsolute.addEventListener('mouseleave', () => {
+                   if (window.innerWidth <= 991) return;
+                   cursor.style.display = 'none';
+                   restaurantLinkAbsolute.removeEventListener('mousemove', followCursor);
+               }, { once: true });
+           });
+
            restaurantLinkAbsolute.addEventListener('click', (e) => {
                if (window.innerWidth <= 991) return;
                e.preventDefault();
@@ -428,32 +452,6 @@ window.addEventListener('load', () => {
                    });
                }
            });
-
-           // Ajout du suivi du curseur
-           const cursor = document.querySelector('.cursor');
-           
-           restaurantLinkAbsolute.addEventListener('mouseenter', () => {
-               if (window.innerWidth <= 991) return;
-               cursor.style.display = 'block';
-               
-               document.addEventListener('mousemove', followCursor);
-           });
-
-           restaurantLinkAbsolute.addEventListener('mouseleave', () => {
-               if (window.innerWidth <= 991) return;
-               cursor.style.display = 'none';
-               
-               document.removeEventListener('mousemove', followCursor);
-           });
-
-           function followCursor(e) {
-               gsap.to(cursor, {
-                   x: e.clientX,
-                   y: e.clientY,
-                   duration: 0.2,
-                   ease: 'power2.out'
-               });
-           }
        });
 
        clickElement.addEventListener('click', (e) => {
