@@ -387,9 +387,13 @@ window.addEventListener('load', () => {
                
                const followCursor = (e) => {
                    const rect = restaurantLinkAbsolute.getBoundingClientRect();
+                   const cursorRect = cursor.getBoundingClientRect();
+                   const cursorWidth = cursorRect.width;
+                   const cursorHeight = cursorRect.height;
+                   
                    gsap.to(cursor, {
-                       x: e.clientX - rect.left,
-                       y: e.clientY - rect.top,
+                       x: e.clientX - rect.left - (cursorWidth / 2),
+                       y: e.clientY - rect.top - (cursorHeight / 2),
                        duration: 0.2,
                        ease: 'power2.out'
                    });
