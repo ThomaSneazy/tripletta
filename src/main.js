@@ -563,7 +563,8 @@ window.addEventListener('load', () => {
        onEnter: () => {
            if (isMobile()) return;
            const state = Flip.getState(showMenu, {
-               props: "all"
+               props: "all",
+               simple: true
            });
            starBloc.appendChild(showMenu);
            
@@ -573,6 +574,8 @@ window.addEventListener('load', () => {
                absolute: true,
                scale: true,
                spin: true,
+               simple: true,
+               transformOrigin: "center center"
            });
        },
        onLeaveBack: () => {
@@ -599,7 +602,8 @@ window.addEventListener('load', () => {
        onEnter: () => {
            if (isMobile()) return;
            const state = Flip.getState(showMenu, {
-               props: "all"
+               props: "all",
+               simple: true
            });
            
            starBloc2.appendChild(showMenu);
@@ -610,6 +614,8 @@ window.addEventListener('load', () => {
                absolute: true,
                scale: true,
                spin: true,
+               simple: true,
+               transformOrigin: "center center"
            });
        },
        onLeaveBack: () => {
